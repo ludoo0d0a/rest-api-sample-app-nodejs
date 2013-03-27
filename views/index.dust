@@ -1,0 +1,22 @@
+{>layout/}
+{<content}
+	      <div class="row pizza-row">
+        <div class="span2">
+          <div class="image">
+            <img alt="Pizza 0" src="../images/0000000000000000000000000000000">
+          </div>
+          <div class="details">
+            10$ -
+            <a href="/order?amount=15&desc=pizza0" class="btn btn-small" data-disable-with="Procesing.." data-method="post" rel="nofollow">Buy</a>
+          </div>
+        </div>
+        <div class="span2">
+          <div class="image">
+            <img alt="Pizza 1" src="../images/0000000000000000000000000000001">
+          </div>
+          <div class="details">
+            15$ -
+            <a href="./order/order_confirmation.php?order%5Bamount%5D=15.00&order%5Bdescription%5D=Pizza+1" class="btn btn-small" data-disable-with="Procesing.." data-method="post" rel="nofollow">Buy</a>
+          </div>
+        </div>
+{/content}
