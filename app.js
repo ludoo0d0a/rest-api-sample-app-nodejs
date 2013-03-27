@@ -8,6 +8,7 @@ var template_engine = 'dust'
 
 var express = require('express')
   , routes = require('./routes')
+  , db = require('./lib/db')
   , http = require('http')
 	, store = new express.session.MemoryStore
   , path = require('path');
@@ -58,7 +59,11 @@ app.configure('development', function(){
 });
 
 app.locals.inspect = require('util').inspect;
+
 app.get('/', routes.index);
+app.get('/signup', routes.signup);
+app.get('/signin', routes.signin);
+app.get('/profile', routes.profile);
 
 var paypal_api = require('./lib/paypal-rest-api.js')();
 

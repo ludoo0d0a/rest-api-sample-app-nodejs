@@ -13,13 +13,11 @@
     <link href="../images/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon">
   </head>
   <body style="zoom: 1;">
-
+	{>"inc/header"/}
     <h1>{title}</h1>
 		{+content}
 			This is the base content.
 		{/content}
+	{>"inc/footer"/}	
   </body>
-<!--
-{session}
--->
 </html>
