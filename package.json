@@ -10,6 +10,7 @@
     "dustjs-linkedin": "*",
     "dustjs-helpers": "*",
     "mongoskin": "*",
+    "consolidate": "*",
     "connect-flash": "*"
   },  
   "engines": {
