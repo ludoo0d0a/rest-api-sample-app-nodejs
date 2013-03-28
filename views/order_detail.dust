@@ -1,0 +1,28 @@
+ {>layout/}
+{<content}
+	<div class='container' id='content'>
+				<h2>Orders</h2>
+		<table class='table'>
+			<thead>
+				<tr>
+					<th>Payment ID</th>
+					<th>Amount($)</th>
+					<th>Payment Status</th>
+					<th>Time</th>
+					<th>Description</th>
+				</tr>
+			</thead>			
+			<tbody>
+				  {#ordrs}
+				<tr>
+					<td>{paymentId}</td>
+					<td>{#.}{amount}{/.}</td>
+					<td>approved</td>
+					<td>2013-03-28 15:41:15</td>
+					<td>Pizza 0</td>					
+				</tr>
+            		   {/ordrs}
+			</tbody>
+		</table>
+	</div>
+   {/content}
