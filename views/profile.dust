@@ -1,13 +1,19 @@
 {>layout/}
 {<content}
     <div class='container' id='content'>
+		{#message}
+		<div class="alert fade in alert-{type}">
+			<button class="close" data-dismiss="alert">&times;</button>
+			{desc}
+		</div>
+		{/message}    
 		<h2>Edit profile</h2>
 		<form accept-charset="UTF-8" action="" autocomplete="off" class="simple_form form-horizontal edit_user" id="edit_user" method="post" novalidate="novalidate">
 		
         	<div class="control-group email required">
         		<label class="email required control-label" for="user_email"> Email</label>
         		<div class="controls">
-        			<input autofocus="autofocus" class="string email required" id="user_email" name="user[email]" size="50" type="email" value="" readonly="true" />
+        			<input autofocus="autofocus" class="string email required" id="user_email" name="user[email]" size="50" type="email" value="{user.email}" readonly="true" />
     			</div>
 			</div>
         	
@@ -32,25 +38,25 @@
 			<div class='control-group'>
 				<label class='control-label'>Type</label>
 				<div class='controls'>
-            		<label class='checkbox'>visa</label>
+            		<label class='checkbox'>{card.type}</label>
           		</div>
         	</div>
         	<div class='control-group'>
 				<label class='control-label'>Number</label>
 				<div class='controls'>
-					<label class='checkbox'>xxxxxxxxxxxx0505</label>
+					<label class='checkbox'>{card.number}</label>
 				</div>
 	        </div>
         	<div class='control-group'>
           		<label class='control-label'>Expire month</label>
           		<div class='controls'>
-            		<label class='checkbox'>10</label>
+            		<label class='checkbox'>{card.expire_month}</label>
           		</div>
         	</div>
         	<div class='control-group'>
           		<label class='control-label'>Expire year</label>
 				<div class='controls'>
-					<label class='checkbox'>2020</label>
+					<label class='checkbox'>{card.expire_year}</label>
 	          	</div>
 	        </div>
 	        
