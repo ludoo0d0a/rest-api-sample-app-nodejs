@@ -1,6 +1,7 @@
 var db = require('../lib/db')();
 var paypal = require('../lib/paypal-rest-api')();
 
+var token = null;
 
 var http_default_opts = {
 	'host': 'api.sandbox.paypal.com',
@@ -11,9 +12,11 @@ var http_default_opts = {
 		'Authorization': ''
 	}
 };
+
+paypal.configure(http_default_opts);
+
 var client_id = 'EBWKjlELKMYqRNQ6sYvFo64FtaRLRR5BdHEESmha49TM';
 var client_secret = 'EO422dn3gQLgDbuwqTjzrFgFtaRLRR5BdHEESmha49TM';
-paypal.configure(http_default_opts);
 
 exports.index = function(req, res){
 	res.locals.session = req.session;
@@ -126,4 +129,63 @@ exports.profile = function(req, res){
 			});			
 		}
 	});	
+};
+
+exports.orderconfirm = function(req, res){
+    var amount = req.query["amount"],
+        desc   = req.query["desc"],
+        orders = ['one','two'];
+        
+	res.render('order_confirm', {'amount' : amount, 'desc' : desc, 'credit_card' : 'true', 'orders' : orders});
+};
+
+exports.order = function(req, res){
+console.log(req.query["order_amount"]);
+console.log('**********************');
+
+paypal.generateToken(client_id, client_secret, function(generatedToken) {
+	token = generatedToken;
+	console.log("The Generated Token is " + token);
+
+	http_default_opts.headers['Authorization'] = token;
+    if(req.query['order_payment_method'] == 'credit_card')
+    {
+        var savedCard = {
+        "intent": "sale",
+        "payer": {
+            "payment_method": "credit_card",
+            "funding_instruments": [{
+                "credit_card_token": {
+                    "credit_card_id": ""
+                }
+            }]
+        },
+        "transactions": [{
+            "amount": {
+                "currency": "USD",
+                "total": ""
+            },
+            "description": "This is the payment description."
+        }]
+    }
+    savedCard.payer.funding_instruments[0].credit_card_token.credit_card_id = 'CARD-5BT058015C739554AKE2GCEI';
+    savedCard.transactions[0].amount.total = '1';
+    console.log(savedCard.transactions[0].amount.total);
+	paypal.payment.create(savedCard, http_default_opts, function(resp, err) {
+		if (err) {
+			throw err;
+		}
+
+		if (resp) {
+			console.log("Create Payment Response");
+			console.log(resp);
+            var ordrs = [{'paymentId' : 'one', 'amount' : '1.00'},
+                         {'paymentId' : 'two', 'amount' : '2.00'}]
+            res.render('order_detail', {
+            title: 'Recent Order Details', 'ordrs' : ordrs
+            });
+		}
+	});
+   }
+});
 };
