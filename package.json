@@ -9,9 +9,8 @@
     "express": "3.x",
     "dustjs-linkedin": "*",
     "dustjs-helpers": "*",
-    "consolidate": "*",
     "mongoskin": "*",
-    "less-middleware": "*"
+    "connect-flash": "*"
   },  
   "engines": {
     "node": "0.8.x"
