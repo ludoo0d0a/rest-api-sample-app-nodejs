@@ -234,27 +234,65 @@ paypal.generateToken(client_id, client_secret, function(generatedToken) {
         throw err;
     }
 
-    if (resp) {
+    if(resp) {
         console.log("Create Payment Response");
         console.log(resp);
         var link = resp.links;
         console.log(link);
         for (var i = 0; i < link.length; i++) {
             if(link[i].rel == 'approval_url')
-            {
-            console.log(link[i].href);
-            res.redirect(link[i].href);
+                {
+                console.log(link[i].href);
+                break;
+                }
+            
             }
-            else
-            {
-            console.log('gfffffffffffffff');
-            }
-         
-        }
-
+            db.insertOrder(order_id, req.session.email, resp.id, resp.state, req.session.amount, req.session.desc, 'null', function(err, order) {
+            if(err || !order) {			
+                    console.log(err);
+                    //TODO: Display error message to user
+                    res.render('order_detail', { message: [{desc: "Could not save order details", type: "error"}]});
+                } else {
+                    res.redirect(link[i].href);
+                }
+        });
       }
     });
     
  }
 });
 };
+exports.orderExecute = function(req, res){
+    db.getOrder(req.query.order_id, function(err, order){
+    paypal.generateToken(client_id, client_secret, function(generatedToken) {
+			token = generatedToken;	
+			http_default_opts.headers['Authorization'] = token;
+            var PayerID = '{ "payer_id" : "'+ req.query.PayerID +'" }'
+    paypal.payment.execute(order.payment_id, PayerID, http_default_opts, function(resp, err) {
+            if (err) {
+                console.log(err);
+            } 
+            if (resp) {
+                console.log("execute Payment Response");
+                db.updateOrder(req.query.order_id, resp.state, resp.create_time, function(err, updated){
+                if(err || !updated) {			
+                console.log(err);
+			//TODO: Display error message to user
+                res.render('order_detail', { message: [{desc: "Could not retrieve order information", type: "error"}]});
+                } else {	
+                console.log(updated);
+                db.getOrders(req.session.email, function(err, orderList){
+                        //console.log(orderList);
+                        res.render('order_detail', {
+                        title: 'Recent Order Details', 'ordrs' : orderList
+                            });	
+                        });
+                       }
+                   });
+            }
+    });
+});
+    
+    
+  });  
+ }; 
