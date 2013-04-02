@@ -9,14 +9,14 @@
 				<label class="string optional control-label" for="order_amount">Amount</label>
 				<div class='controls'>
 					<label class='checkbox'> {amount} {#orders}{.}<br>{/orders} </label> <input id="order_amount"
-						name="order[amount]" type="hidden" value='{amount}'/>
+						name="order_amount" type="hidden" value='{amount}'/>
 				</div>
 			</div>
 			<div class='control-group'>
 				<label class="string optional control-label" for="order_description">Description</label>
 				<div class='controls'>
 					<label class='checkbox'> {desc} </label> <input
-						id="order_description" name="order[description]" type="hidden"
+						id="order_description" name="order_description" type="hidden"
 						value='{desc}' />
 				</div>
 			</div>
