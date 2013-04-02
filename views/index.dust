@@ -6,23 +6,176 @@
 			{desc}
 		</div>
 	{/message} 
-	      <div class="row pizza-row">
-        <div class="span2">
-          <div class="image">
-            <img alt="Pizza 0" src="../images/0000000000000000000000000000000">
+	  
+      <div class='container' id='content'>
+      
+      <div class='row pizza-row'>
+        <div class='span2'>
+          <div class='image'>
+            <img  alt="Pizza 0" src="../images/0000000000000000000000000000000" />
           </div>
-          <div class="details">
-            10$ -
-            <a href="/orderConfirm?amount=15&desc=pizza0" class="btn btn-small" data-disable-with="Procesing.." data-method="post" rel="nofollow">Buy</a>
-          </div>
-        </div>
-        <div class="span2">
-          <div class="image">
-            <img alt="Pizza 1" src="../images/0000000000000000000000000000001">
-          </div>
-          <div class="details">
-            15$ -
-            <a href="./order/order_confirmation.php?order%5Bamount%5D=15.00&order%5Bdescription%5D=Pizza+1" class="btn btn-small" data-disable-with="Procesing.." data-method="post" rel="nofollow">Buy</a>
+          <div class='details'>
+            20$ -
+            <a href="/orderConfirm?orderAmount=20.00&orderDescription=Pizza0" class="btn btn-small" data-disable-with="Procesing.." data-method="post" rel="nofollow">Buy</a>
           </div>
         </div>
+        <div class='span2'>
+          <div class='image'>
+            <img   alt="Pizza 1" src="../images/0000000000000000000000000000001" />
+          </div>
+          <div class='details'>
+            20$ -
+            <a href="/orderConfirm?orderAmount=20.00&orderDescription=Pizza1" class="btn btn-small" data-disable-with="Procesing.." data-method="post" rel="nofollow">Buy</a>
+          </div>
+        </div>
+        <div class='span2'>
+          <div class='image'>
+            <img alt="Pizza 2" src="../images/0000000000000000000000000000002" />
+          </div>
+          <div class='details'>
+            20$ -
+            <a href="/orderConfirm?orderAmount=20.00&orderDescription=Pizza2" class="btn btn-small" data-disable-with="Procesing.." data-method="post" rel="nofollow">Buy</a>
+          </div>
+        </div>
+        <div class='span2'>
+          <div class='image'>
+            <img alt="Pizza 3" src="../images/0000000000000000000000000000003" />
+          </div>
+          <div class='details'>
+            20$ -
+            <a href="/orderConfirm?orderAmount=20.00&orderDescription=Pizza3" class="btn btn-small" data-disable-with="Procesing.." data-method="post" rel="nofollow">Buy</a>
+          </div>
+        </div>
+        <div class='span2'>
+          <div class='image'>
+            <img alt="Pizza 4" src="../images/0000000000000000000000000000004" />
+          </div>
+          <div class='details'>
+            20$ -
+            <a href="/orderConfirm?orderAmount=20.00&orderDescription=Pizza4" class="btn btn-small" data-disable-with="Procesing.." data-method="post" rel="nofollow">Buy</a>
+          </div>
+        </div>
+        <div class='span2'>
+          <div class='image'>
+            <img alt="Pizza 5" src="../images/0000000000000000000000000000005" />
+          </div>
+          <div class='details'>
+            20$ -
+            <a href="/orderConfirm?orderAmount=20.00&orderDescription=Pizza5" class="btn btn-small" data-disable-with="Procesing.." data-method="post" rel="nofollow">Buy</a>
+          </div>
+        </div>
+      </div>
+      <div class='row pizza-row'>
+        <div class='span2'>
+          <div class='image'>
+            <img alt="Pizza 6" src="../images/0000000000000000000000000000006" />
+          </div>
+          <div class='details'>
+            20$ -
+            <a href="/orderConfirm?orderAmount=20.00&orderDescription=Pizza6" class="btn btn-small" data-disable-with="Procesing.." data-method="post" rel="nofollow">Buy</a>
+          </div>
+        </div>
+        <div class='span2'>
+          <div class='image'>
+            <img alt="Pizza 7" src="../images/0000000000000000000000000000007" />
+          </div>
+          <div class='details'>
+            20$ -
+            <a href="/orderConfirm?orderAmount=20.00&orderDescription=Pizza7" class="btn btn-small" data-disable-with="Procesing.." data-method="post" rel="nofollow">Buy</a>
+          </div>
+        </div>
+        <div class='span2'>
+          <div class='image'>
+            <img alt="Pizza 8" src="../images/0000000000000000000000000000008" />
+          </div>
+          <div class='details'>
+            20$ -
+            <a href="/orderConfirm?orderAmount=20.00&orderDescription=Pizza8" class="btn btn-small" data-disable-with="Procesing.." data-method="post" rel="nofollow">Buy</a>
+          </div>
+        </div>
+        <div class='span2'>
+          <div class='image'>
+            <img alt="Pizza 9" src="../images/0000000000000000000000000000009" />
+          </div>
+          <div class='details'>
+            20$ -
+            <a href="/orderConfirm?orderAmount=20.00&orderDescription=Pizza9" class="btn btn-small" data-disable-with="Procesing.." data-method="post" rel="nofollow">Buy</a>
+          </div>
+        </div>
+        <div class='span2'>
+          <div class='image'>
+            <img alt="Pizza 10" src="../images/00000000000000000000000000000010" />
+          </div>
+          <div class='details'>
+            20$ -
+            <a href="/orderConfirm?orderAmount=20.00&orderDescription=Pizza10" class="btn btn-small" data-disable-with="Procesing.." data-method="post" rel="nofollow">Buy</a>
+          </div>
+        </div>
+        <div class='span2'>
+          <div class='image'>
+            <img alt="Pizza 11" src="../images/00000000000000000000000000000011" />
+          </div>
+          <div class='details'>
+            20$ -
+            <a href="/orderConfirm?orderAmount=20.00&orderDescription=Pizza11" class="btn btn-small" data-disable-with="Procesing.." data-method="post" rel="nofollow">Buy</a>
+          </div>
+        </div>
+      </div>
+      <div class='row pizza-row'>
+        <div class='span2'>
+          <div class='image'>
+            <img alt="Pizza 12" src="../images/00000000000000000000000000000012" />
+          </div>
+          <div class='details'>
+            20$ -
+            <a href="/orderConfirm?orderAmount=20.00&orderDescription=Pizza12" class="btn btn-small" data-disable-with="Procesing.." data-method="post" rel="nofollow">Buy</a>
+          </div>
+        </div>
+        <div class='span2'>
+          <div class='image'>
+            <img alt="Pizza 13" src="../images/00000000000000000000000000000013" />
+          </div>
+          <div class='details'>
+            20$ -
+            <a href="/orderConfirm?orderAmount=20.00&orderDescription=Pizza13" class="btn btn-small" data-disable-with="Procesing.." data-method="post" rel="nofollow">Buy</a>
+          </div>
+        </div>
+        <div class='span2'>
+          <div class='image'>
+            <img alt="Pizza 14" src="../images/00000000000000000000000000000014" />
+          </div>
+          <div class='details'>
+            20$ -
+            <a href="/orderConfirm?orderAmount=20.00&orderDescription=Pizza14" class="btn btn-small" data-disable-with="Procesing.." data-method="post" rel="nofollow">Buy</a>
+          </div>
+        </div>
+        <div class='span2'>
+          <div class='image'>
+            <img alt="Pizza 15" src="../images/00000000000000000000000000000015" />
+          </div>
+          <div class='details'>
+            20$ -
+            <a href="/orderConfirm?orderAmount=20.00&orderDescription=Pizza15" class="btn btn-small" data-disable-with="Procesing.." data-method="post" rel="nofollow">Buy</a>
+          </div>
+        </div>
+        <div class='span2'>
+          <div class='image'>
+            <img alt="Pizza 16" src="../images/00000000000000000000000000000016" />
+          </div>
+          <div class='details'>
+            20$ -
+            <a href="/orderConfirm?orderAmount=20.00&orderDescription=Pizza16" class="btn btn-small" data-disable-with="Procesing.." data-method="post" rel="nofollow">Buy</a>
+          </div>
+        </div>
+        <div class='span2'>
+          <div class='image'>
+            <img alt="Pizza 17" src="../images/00000000000000000000000000000017" />
+          </div>
+          <div class='details'>
+            20$ -
+            <a href="/orderConfirm?orderAmount=20.00&orderDescription=Pizza18" class="btn btn-small" data-disable-with="Procesing.." data-method="post" rel="nofollow">Buy</a>
+          </div>
+        </div>
+      </div>
+    </div>
 {/content}
