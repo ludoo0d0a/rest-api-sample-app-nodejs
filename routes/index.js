@@ -133,16 +133,17 @@ exports.profile = function(req, res){
 
 exports.orderconfirm = function(req, res){
     var amount = req.query["amount"],
-        desc   = req.query["desc"],
-        orders = ['one','two'];
-        
-	res.render('order_confirm', {'amount' : amount, 'desc' : desc, 'credit_card' : 'true', 'orders' : orders});
+        desc   = req.query["desc"];
+    if(req.session.authenticated) {
+        res.render('order_confirm', {'amount' : amount, 'desc' : desc, 'credit_card' : 'true'});
+    } else {
+        res.redirect('signin');
+    }  
+	
 };
 
 exports.order = function(req, res){
-console.log(req.query["order_amount"]);
-console.log('**********************');
-
+    
 paypal.generateToken(client_id, client_secret, function(generatedToken) {
 	token = generatedToken;
 	console.log("The Generated Token is " + token);
@@ -168,10 +169,17 @@ paypal.generateToken(client_id, client_secret, function(generatedToken) {
             "description": "This is the payment description."
         }]
     }
-    savedCard.payer.funding_instruments[0].credit_card_token.credit_card_id = 'CARD-5BT058015C739554AKE2GCEI';
-    savedCard.transactions[0].amount.total = '1';
-    console.log(savedCard.transactions[0].amount.total);
-	paypal.payment.create(savedCard, http_default_opts, function(resp, err) {
+    
+    db.getUser(req.session.email, function(err, user) {
+		if(err || !user) {			
+			console.log(err);
+			//TODO: Display error message to user
+			res.render('order_detail', { message: [{desc: "Could not retrieve credit card information", type: "error"}]});
+		} else {
+			savedCard.payer.funding_instruments[0].credit_card_token.credit_card_id = user.card;	
+            savedCard.transactions[0].amount.total = req.query['order_amount'];
+            console.log(savedCard.transactions[0].amount.total);
+            paypal.payment.create(savedCard, http_default_opts, function(resp, err) {
 		if (err) {
 			throw err;
 		}
@@ -179,13 +187,28 @@ paypal.generateToken(client_id, client_secret, function(generatedToken) {
 		if (resp) {
 			console.log("Create Payment Response");
 			console.log(resp);
+            console.log("rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
+           var id = new ObjectId();
+        db.insertOrder(id, req.session.email, resp.id, resp.state, req.query['order_amount'], req.query['order_description'], resp.create_time, function(err, user) {
+		if(err || !user) {			
+			console.log(err);
+			//TODO: Display error message to user
+			res.render('order_detail', { message: [{desc: "Could not save order details", type: "error"}]});
+		} else {
             var ordrs = [{'paymentId' : 'one', 'amount' : '1.00'},
                          {'paymentId' : 'two', 'amount' : '2.00'}]
             res.render('order_detail', {
             title: 'Recent Order Details', 'ordrs' : ordrs
-            });
+            });		
+				
 		}
 	});
+           
+		}
+	  });    
+	}
+  });
+    	
    }
 });
 };
