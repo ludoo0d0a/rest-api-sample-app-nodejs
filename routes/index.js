@@ -1,6 +1,6 @@
 var db = require('../lib/db')();
 var paypal = require('../lib/paypal-rest-api')();
-
+var uuid = require('node-uuid');
 var token = null;
 
 var http_default_opts = {
@@ -134,6 +134,8 @@ exports.profile = function(req, res){
 exports.orderconfirm = function(req, res){
     var amount = req.query["amount"],
         desc   = req.query["desc"];
+        req.session.amount = amount;
+        req.session.desc = desc;
     if(req.session.authenticated) {
         res.render('order_confirm', {'amount' : amount, 'desc' : desc, 'credit_card' : 'true'});
     } else {
@@ -147,8 +149,9 @@ exports.order = function(req, res){
 paypal.generateToken(client_id, client_secret, function(generatedToken) {
 	token = generatedToken;
 	console.log("The Generated Token is " + token);
-
 	http_default_opts.headers['Authorization'] = token;
+    var order_id = uuid.v4();
+    
     if(req.query['order_payment_method'] == 'credit_card')
     {
         var savedCard = {
@@ -180,35 +183,78 @@ paypal.generateToken(client_id, client_secret, function(generatedToken) {
             savedCard.transactions[0].amount.total = req.query['order_amount'];
             console.log(savedCard.transactions[0].amount.total);
             paypal.payment.create(savedCard, http_default_opts, function(resp, err) {
-		if (err) {
-			throw err;
-		}
+            if (err) {
+                throw err;
+            } 
+            if (resp) {
+                console.log("Create Payment Response");
+                
+                db.insertOrder(order_id, req.session.email, resp.id, resp.state, req.session.amount, req.session.desc, resp.create_time, function(err, order) {
+                if(err || !order) {			
+                    console.log(err);
+                    //TODO: Display error message to user
+                    res.render('order_detail', { message: [{desc: "Could not save order details", type: "error"}]});
+                } else {
+                    db.getOrders(req.session.email, function(err, orderList){
+                        console.log(orderList);
+                        res.render('order_detail', {
+                        title: 'Recent Order Details', 'ordrs' : orderList
+                            });	
+                        });		
+                    }
+                });           
+            }
+        });    
+	  }
+  });   	
+ }
+ if(req.query['order_payment_method'] == 'paypal'){
+    var paypalPayment = {
+        "intent": "sale",
+        "payer": {
+            "payment_method": "paypal"
+        },
+        "redirect_urls": {
+        "return_url": "",
+        "cancel_url": "http:\/\/localhost\/test\/rest\/rest-api-sdk-php\/sample\/payments\/ExecutePayment.php?success=false"
+        },
+        "transactions": [{
+        "amount": {
+        "currency": "USD",
+        "total": ""
+        },
+        "description": "This is the payment description."
+        }]
+    };
+    
+    paypalPayment.transactions[0].amount.total = req.query['order_amount'];
+    paypalPayment.redirect_urls.return_url = "http://localhost:8080/orderExecute?order_id=" + order_id;
+    paypal.payment.create(paypalPayment, http_default_opts, function(resp, err) {
+    if (err) {
+        throw err;
+    }
 
-		if (resp) {
-			console.log("Create Payment Response");
-			console.log(resp);
-            console.log("rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
-           var id = new ObjectId();
-        db.insertOrder(id, req.session.email, resp.id, resp.state, req.query['order_amount'], req.query['order_description'], resp.create_time, function(err, user) {
-		if(err || !user) {			
-			console.log(err);
-			//TODO: Display error message to user
-			res.render('order_detail', { message: [{desc: "Could not save order details", type: "error"}]});
-		} else {
-            var ordrs = [{'paymentId' : 'one', 'amount' : '1.00'},
-                         {'paymentId' : 'two', 'amount' : '2.00'}]
-            res.render('order_detail', {
-            title: 'Recent Order Details', 'ordrs' : ordrs
-            });		
-				
-		}
-	});
-           
-		}
-	  });    
-	}
-  });
-    	
-   }
+    if (resp) {
+        console.log("Create Payment Response");
+        console.log(resp);
+        var link = resp.links;
+        console.log(link);
+        for (var i = 0; i < link.length; i++) {
+            if(link[i].rel == 'approval_url')
+            {
+            console.log(link[i].href);
+            res.redirect(link[i].href);
+            }
+            else
+            {
+            console.log('gfffffffffffffff');
+            }
+         
+        }
+
+      }
+    });
+    
+ }
 });
 };
