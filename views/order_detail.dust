@@ -11,7 +11,7 @@
 		<table class='table'>
 			<thead>
 				<tr>
-					<th>Payment ID</th>
+					<th>Order Id</th>
 					<th>Amount($)</th>
 					<th>Payment Status</th>
 					<th>Time</th>
@@ -21,11 +21,11 @@
 			<tbody>
 				  {#ordrs}
 				<tr>
-					<td>{paymentId}</td>
-					<td>{#.}{amount}{/.}</td>
-					<td>approved</td>
-					<td>2013-03-28 15:41:15</td>
-					<td>Pizza 0</td>					
+					<td>{_id}</td>
+					<td>{amount}</td>
+					<td>{state}</td>
+					<td>{created_time}</td>
+					<td>{description}</td>					
 				</tr>
             		   {/ordrs}
 			</tbody>
