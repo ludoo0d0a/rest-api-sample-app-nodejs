@@ -50,7 +50,7 @@ app.get('/signout', routes.signout);
 app.get('/profile', routes.auth, routes.profile);
 
 app.get('/order', routes.order);
-app.get('/orders', routes.orders);
+app.get('/orderList', routes.orderList);
 app.get('/orderConfirm', routes.orderconfirm);
 app.get('/orderExecute', routes.orderExecute);
 
