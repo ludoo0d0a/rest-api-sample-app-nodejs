@@ -50,7 +50,9 @@ app.get('/signout', routes.signout);
 app.get('/profile', routes.auth, routes.profile);
 
 app.get('/order', routes.order);
+app.get('/orders', routes.orders);
 app.get('/orderConfirm', routes.orderconfirm);
+app.get('/orderExecute', routes.orderExecute);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
