@@ -12,6 +12,7 @@
     "mongoskin": "*",
     "consolidate": "*",
     "connect-flash": "*",
+    "node-uuid": "*",
     "paypal-rest-sdk": "*"
   },  
   "engines": {
