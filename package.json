@@ -11,7 +11,8 @@
     "dustjs-helpers": "*",
     "mongoskin": "*",
     "consolidate": "*",
-    "connect-flash": "*"
+    "connect-flash": "*",
+    "paypal-rest-sdk": "*"
   },  
   "engines": {
     "node": "0.8.x"
