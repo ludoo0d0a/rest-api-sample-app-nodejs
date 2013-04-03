@@ -41,7 +41,7 @@ exports.completesignup = function(req, res) {
 		//TODO: Add card validation		
 		card = {type: userCard.type, number: userCard.number, cvv2: userCard.cvv2, expire_month: userCard.expire_month, expire_year: userCard.expire_year };			
 		//TODO: Create user even when card details are not given
-		paypal.credit_card.create(card, http_default_opts, function(card, err) {
+		paypal.credit_card.create(card, http_default_opts, function(err, card) {
 			console.log(card);
 			cardId = (err) ? "" : card.id; 
 			db.createUser(user.email, user.password, card.id, function(dbErr, response) {
@@ -101,7 +101,7 @@ exports.profile = function(req, res) {
 			//TODO: Display error message to user
 			res.render('profile', { message: [{desc: "Could not retrieve profile information", type: "error"}]});
 		} else {		
-			paypal.credit_card.get(user.card, http_default_opts, function(card, err) {
+			paypal.credit_card.get(user.card, http_default_opts, function(err, card) {
 				if(err) {						
 					res.render('profile', {user: user, message: [{desc: "Could not retrieve card information", type: "error"}]});
 				} else {
@@ -164,8 +164,9 @@ exports.order = function(req, res) {
 				savedCard.payer.funding_instruments[0].credit_card_token.credit_card_id = user.card;	
 				savedCard.transactions[0].amount.total = req.query['order_amount'];
 				console.log(savedCard.transactions[0].amount.total);
-				paypal.payment.create(savedCard, http_default_opts, function(resp, err) {
+				paypal.payment.create(savedCard, http_default_opts, function(err, resp) {
 					if (err) {
+                        console.log(err);
 						throw err;
 					} 
 					if (resp) {
@@ -180,7 +181,7 @@ exports.order = function(req, res) {
 								db.getOrders(req.session.email, function(err, orderList) {
 									console.log(orderList);
 									res.render('order_detail', {
-										title: 'Recent Order Details', 'ordrs' : orderList
+										 title: 'Recent Order Details', 'ordrs' : orderList, message: [{desc: "Order placed successfully..", type: "ifno"}]
 									});	
 								});		
 							}
@@ -210,7 +211,7 @@ exports.order = function(req, res) {
     
 	    paypalPayment.transactions[0].amount.total = req.query['order_amount'];
 	    paypalPayment.redirect_urls.return_url = "http://localhost:8080/orderExecute?order_id=" + order_id;
-	    paypal.payment.create(paypalPayment, http_default_opts, function(resp, err) {
+	    paypal.payment.create(paypalPayment, http_default_opts, function(err, resp) {
 		    if (err) {
 		        throw err;
 		    }
@@ -245,7 +246,7 @@ exports.orderExecute = function(req, res) {
     res.locals.session = req.session;
     db.getOrder(req.query.order_id, function(err, order) {
         var PayerID = '{ "payer_id" : "'+ req.query.PayerID +'" }'
-        paypal.payment.execute(order.payment_id, PayerID, http_default_opts, function(resp, err) {
+        paypal.payment.execute(order.payment_id, PayerID, http_default_opts, function(err, resp) {
             if (err) {
                 console.log(err);
             } 
@@ -261,7 +262,7 @@ exports.orderExecute = function(req, res) {
                         db.getOrders(req.session.email, function(err, orderList) {
                             //console.log(orderList);
                             res.render('order_detail', {
-                            title: 'Recent Order Details', 'ordrs' : orderList
+                            title: 'Recent Order Details', 'ordrs' : orderList, message: [{desc: "Order placed successfully..", type: "ifno"}]
                             });	
                         });
                     }
@@ -270,4 +271,17 @@ exports.orderExecute = function(req, res) {
         });
     });  
  }; 
- 
+exports.orderList = function(req, res) {
+    res.locals.session = req.session;
+    if(req.session.authenticated) {
+       db.getOrders(req.session.email, function(err, orderList) {
+        //console.log(orderList);
+        res.render('order_detail', {
+            title: 'Recent Order Details', 'ordrs' : orderList
+        });	
+    });
+    } else {
+        res.redirect('signin');
+    }  
+    
+};
