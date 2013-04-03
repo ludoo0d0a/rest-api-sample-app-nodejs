@@ -1,5 +1,5 @@
 var db = require('../lib/db')();
-var paypal = require('../lib/paypal-rest-api')();
+var paypal = require('paypal-rest-sdk')();
 var uuid = require('node-uuid');
 var token = null;
 
@@ -132,8 +132,9 @@ exports.profile = function(req, res){
 };
 
 exports.orderconfirm = function(req, res){
-    var amount = req.query["amount"],
-        desc   = req.query["desc"];
+    res.locals.session = req.session;
+    var amount = req.query["orderAmount"],
+        desc   = req.query["orderDescription"];
         req.session.amount = amount;
         req.session.desc = desc;
     if(req.session.authenticated) {
@@ -145,7 +146,7 @@ exports.orderconfirm = function(req, res){
 };
 
 exports.order = function(req, res){
-    
+res.locals.session = req.session;   
 paypal.generateToken(client_id, client_secret, function(generatedToken) {
 	token = generatedToken;
 	console.log("The Generated Token is " + token);
@@ -247,7 +248,7 @@ paypal.generateToken(client_id, client_secret, function(generatedToken) {
                 }
             
             }
-            db.insertOrder(order_id, req.session.email, resp.id, resp.state, req.session.amount, req.session.desc, 'null', function(err, order) {
+            db.insertOrder(order_id, req.session.email, resp.id, resp.state, req.session.amount, req.session.desc, '2012', function(err, order) {
             if(err || !order) {			
                     console.log(err);
                     //TODO: Display error message to user
@@ -263,36 +264,37 @@ paypal.generateToken(client_id, client_secret, function(generatedToken) {
 });
 };
 exports.orderExecute = function(req, res){
+    res.locals.session = req.session;
     db.getOrder(req.query.order_id, function(err, order){
     paypal.generateToken(client_id, client_secret, function(generatedToken) {
 			token = generatedToken;	
 			http_default_opts.headers['Authorization'] = token;
             var PayerID = '{ "payer_id" : "'+ req.query.PayerID +'" }'
-    paypal.payment.execute(order.payment_id, PayerID, http_default_opts, function(resp, err) {
-            if (err) {
-                console.log(err);
-            } 
-            if (resp) {
-                console.log("execute Payment Response");
-                db.updateOrder(req.query.order_id, resp.state, resp.create_time, function(err, updated){
-                if(err || !updated) {			
-                console.log(err);
-			//TODO: Display error message to user
-                res.render('order_detail', { message: [{desc: "Could not retrieve order information", type: "error"}]});
-                } else {	
-                console.log(updated);
-                db.getOrders(req.session.email, function(err, orderList){
-                        //console.log(orderList);
-                        res.render('order_detail', {
-                        title: 'Recent Order Details', 'ordrs' : orderList
-                            });	
-                        });
-                       }
-                   });
-            }
-    });
-});
-    
-    
-  });  
+            paypal.payment.execute(order.payment_id, PayerID, http_default_opts, function(resp, err) {
+                if (err) {
+                    console.log(err);
+                } 
+                if (resp) {
+                    console.log("execute Payment Response");
+                    db.updateOrder(req.query.order_id, resp.state, resp.create_time, function(err, updated){
+                        if(err) {			
+                        console.log(err);
+                        //TODO: Display error message to user
+                        res.render('order_detail', { message: [{desc: "Could not retrieve order information", type: "error"}]});
+                        } 
+                        else {	
+                            console.log(updated);
+                            db.getOrders(req.session.email, function(err, orderList){
+                                //console.log(orderList);
+                                res.render('order_detail', {
+                                title: 'Recent Order Details', 'ordrs' : orderList
+                                });	
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    });  
  }; 
+ 
