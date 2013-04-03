@@ -49,88 +49,11 @@ app.post('/login', routes.dologin);
 app.get('/signout', routes.signout);
 app.get('/profile', routes.auth, routes.profile);
 
-var paypal_api = require('./lib/paypal-rest-api.js')();
+app.get('/order', routes.order);
+app.get('/orders', routes.orders);
+app.get('/orderConfirm', routes.orderconfirm);
+app.get('/orderExecute', routes.orderExecute);
 
-var token = null;
-
-var http_default_opts = {
-	'host': 'api.sandbox.paypal.com',
-	'port': '',
-	'headers': {
-		'Accept': 'application/json',
-		'Content-Type': 'application/json',
-		'Authorization': ''
-	}
-};
-
-paypal_api.configure(http_default_opts);
-
-var client_id = 'EBWKjlELKMYqRNQ6sYvFo64FtaRLRR5BdHEESmha49TM';
-var client_secret = 'EO422dn3gQLgDbuwqTjzrFgFtaRLRR5BdHEESmha49TM';
-
-app.get('/order', function(req, res) {
-
-//console.log(req.query["id"]);
-paypal_api.generateToken(client_id, client_secret, function(generatedToken) {
-	token = generatedToken;
-	console.log("The Generated Token is " + token);
-
-	http_default_opts.headers['Authorization'] = token;
-
-	paypal_api.payment.create(create_payment_json, http_default_opts, function(resp, err) {
-		if (err) {
-			throw err;
-		}
-
-		if (resp) {
-			console.log("Create Payment Response");
-			console.log(resp);
-            res.render('index', {
-            title: 'Testing out dust.js server-side rendering'
-            });
-		}
-	});
-
-});
-
-var create_payment_json = {
-	"intent": "sale",
-	"payer": {
-		"payment_method": "credit_card",
-		"funding_instruments": [{
-			"credit_card": {
-				"type": "visa",
-				"number": "4417119669820331",
-				"expire_month": "11",
-				"expire_year": "2018",
-				"cvv2": "874",
-				"first_name": "Joe",
-				"last_name": "Shopper",
-				"billing_address": {
-					"line1": "52 N Main ST",
-					"city": "Johnstown",
-					"state": "OH",
-					"postal_code": "43210",
-					"country_code": "US"
-				}
-			}
-		}]
-	},
-	"transactions": [{
-		"amount": {
-			"total": "7",
-			"currency": "USD",
-			"details": {
-				"subtotal": "5",
-				"tax": "1",
-				"shipping": "1"
-			}
-		},
-		"description": "This is the payment transaction description."
-	}]
-};
-
-});
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
 });

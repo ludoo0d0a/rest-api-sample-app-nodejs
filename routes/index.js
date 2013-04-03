@@ -1,6 +1,7 @@
 var db = require('../lib/db')();
-var paypal = require('../lib/paypal-rest-api')();
-
+var paypal = require('paypal-rest-sdk')();
+var uuid = require('node-uuid');
+var token = null;
 
 var http_default_opts = {
 	'host': 'api.sandbox.paypal.com',
@@ -11,9 +12,11 @@ var http_default_opts = {
 		'Authorization': ''
 	}
 };
+
+paypal.configure(http_default_opts);
+
 var client_id = 'EBWKjlELKMYqRNQ6sYvFo64FtaRLRR5BdHEESmha49TM';
 var client_secret = 'EO422dn3gQLgDbuwqTjzrFgFtaRLRR5BdHEESmha49TM';
-paypal.configure(http_default_opts);
 
 exports.index = function(req, res){
 	res.locals.session = req.session;
@@ -127,3 +130,171 @@ exports.profile = function(req, res){
 		}
 	});	
 };
+
+exports.orderconfirm = function(req, res){
+    res.locals.session = req.session;
+    var amount = req.query["orderAmount"],
+        desc   = req.query["orderDescription"];
+        req.session.amount = amount;
+        req.session.desc = desc;
+    if(req.session.authenticated) {
+        res.render('order_confirm', {'amount' : amount, 'desc' : desc, 'credit_card' : 'true'});
+    } else {
+        res.redirect('signin');
+    }  
+	
+};
+
+exports.order = function(req, res){
+res.locals.session = req.session;   
+paypal.generateToken(client_id, client_secret, function(generatedToken) {
+	token = generatedToken;
+	console.log("The Generated Token is " + token);
+	http_default_opts.headers['Authorization'] = token;
+    var order_id = uuid.v4();
+    
+    if(req.query['order_payment_method'] == 'credit_card')
+    {
+        var savedCard = {
+        "intent": "sale",
+        "payer": {
+            "payment_method": "credit_card",
+            "funding_instruments": [{
+                "credit_card_token": {
+                    "credit_card_id": ""
+                }
+            }]
+        },
+        "transactions": [{
+            "amount": {
+                "currency": "USD",
+                "total": ""
+            },
+            "description": "This is the payment description."
+        }]
+    }
+    
+    db.getUser(req.session.email, function(err, user) {
+		if(err || !user) {			
+			console.log(err);
+			//TODO: Display error message to user
+			res.render('order_detail', { message: [{desc: "Could not retrieve credit card information", type: "error"}]});
+		} else {
+			savedCard.payer.funding_instruments[0].credit_card_token.credit_card_id = user.card;	
+            savedCard.transactions[0].amount.total = req.query['order_amount'];
+            console.log(savedCard.transactions[0].amount.total);
+            paypal.payment.create(savedCard, http_default_opts, function(resp, err) {
+            if (err) {
+                throw err;
+            } 
+            if (resp) {
+                console.log("Create Payment Response");
+                
+                db.insertOrder(order_id, req.session.email, resp.id, resp.state, req.session.amount, req.session.desc, resp.create_time, function(err, order) {
+                if(err || !order) {			
+                    console.log(err);
+                    //TODO: Display error message to user
+                    res.render('order_detail', { message: [{desc: "Could not save order details", type: "error"}]});
+                } else {
+                    db.getOrders(req.session.email, function(err, orderList){
+                        console.log(orderList);
+                        res.render('order_detail', {
+                        title: 'Recent Order Details', 'ordrs' : orderList
+                            });	
+                        });		
+                    }
+                });           
+            }
+        });    
+	  }
+  });   	
+ }
+ if(req.query['order_payment_method'] == 'paypal'){
+    var paypalPayment = {
+        "intent": "sale",
+        "payer": {
+            "payment_method": "paypal"
+        },
+        "redirect_urls": {
+        "return_url": "",
+        "cancel_url": "http:\/\/localhost\/test\/rest\/rest-api-sdk-php\/sample\/payments\/ExecutePayment.php?success=false"
+        },
+        "transactions": [{
+        "amount": {
+        "currency": "USD",
+        "total": ""
+        },
+        "description": "This is the payment description."
+        }]
+    };
+    
+    paypalPayment.transactions[0].amount.total = req.query['order_amount'];
+    paypalPayment.redirect_urls.return_url = "http://localhost:8080/orderExecute?order_id=" + order_id;
+    paypal.payment.create(paypalPayment, http_default_opts, function(resp, err) {
+    if (err) {
+        throw err;
+    }
+
+    if(resp) {
+        console.log("Create Payment Response");
+        console.log(resp);
+        var link = resp.links;
+        console.log(link);
+        for (var i = 0; i < link.length; i++) {
+            if(link[i].rel == 'approval_url')
+                {
+                console.log(link[i].href);
+                break;
+                }
+            
+            }
+            db.insertOrder(order_id, req.session.email, resp.id, resp.state, req.session.amount, req.session.desc, '2012', function(err, order) {
+            if(err || !order) {			
+                    console.log(err);
+                    //TODO: Display error message to user
+                    res.render('order_detail', { message: [{desc: "Could not save order details", type: "error"}]});
+                } else {
+                    res.redirect(link[i].href);
+                }
+        });
+      }
+    });
+    
+ }
+});
+};
+exports.orderExecute = function(req, res){
+    res.locals.session = req.session;
+    db.getOrder(req.query.order_id, function(err, order){
+    paypal.generateToken(client_id, client_secret, function(generatedToken) {
+			token = generatedToken;	
+			http_default_opts.headers['Authorization'] = token;
+            var PayerID = '{ "payer_id" : "'+ req.query.PayerID +'" }'
+            paypal.payment.execute(order.payment_id, PayerID, http_default_opts, function(resp, err) {
+                if (err) {
+                    console.log(err);
+                } 
+                if (resp) {
+                    console.log("execute Payment Response");
+                    db.updateOrder(req.query.order_id, resp.state, resp.create_time, function(err, updated){
+                        if(err) {			
+                        console.log(err);
+                        //TODO: Display error message to user
+                        res.render('order_detail', { message: [{desc: "Could not retrieve order information", type: "error"}]});
+                        } 
+                        else {	
+                            console.log(updated);
+                            db.getOrders(req.session.email, function(err, orderList){
+                                //console.log(orderList);
+                                res.render('order_detail', {
+                                title: 'Recent Order Details', 'ordrs' : orderList
+                                });	
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    });  
+ }; 
+ 

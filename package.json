@@ -10,7 +10,9 @@
     "dustjs-linkedin": "*",
     "dustjs-helpers": "*",
     "mongoskin": "*",
-    "connect-flash": "*"
+    "consolidate": "*",
+    "connect-flash": "*",
+    "paypal-rest-sdk": "*"
   },  
   "engines": {
     "node": "0.8.x"
