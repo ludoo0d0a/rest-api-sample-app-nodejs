@@ -18,10 +18,11 @@ if ( template_engine == 'dust' ) {
 app.configure(function() {
 	app.set('template_engine', template_engine);
 	app.set('domain', domain);
-	app.set('port', process.env.PORT || 8080);
+	app.set('port', process.env.PORT || 3000);
 	app.set('views', __dirname + '/views');
 	app.set('view engine', template_engine);
 	app.use(express.favicon());
+	app.use(express.compress());
 	app.use(express.logger('dev'));	
 	app.use(express.bodyParser());	
 	app.use(express.cookieParser());
@@ -45,14 +46,15 @@ app.post('/signup', routes.completesignup);
 
 app.get('/signin', routes.signin);
 app.post('/login', routes.dologin);
-
 app.get('/signout', routes.signout);
-app.get('/profile', routes.auth, routes.profile);
 
-app.get('/order', routes.order);
-app.get('/orderList', routes.orderList);
-app.get('/orderConfirm', routes.orderconfirm);
-app.get('/orderExecute', routes.orderExecute);
+app.get('/profile', routes.auth, routes.profile);
+app.post('/profile', routes.auth, routes.updateprofile);
+
+app.get('/order', routes.auth, routes.order);
+app.get('/orderList', routes.auth, routes.orderList);
+app.get('/orderConfirm', routes.auth, routes.orderconfirm);
+app.get('/orderExecute', routes.auth, routes.orderExecute);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));

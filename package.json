@@ -6,14 +6,14 @@
     "start": "node app.js"
   },
   "dependencies": {
+    "paypal-rest-sdk": "*",
     "express": "3.x",
     "dustjs-linkedin": "*",
     "dustjs-helpers": "*",
     "mongoskin": "*",
     "consolidate": "*",
     "connect-flash": "*",
-    "node-uuid": "*",
-    "paypal-rest-sdk": "*"
+    "node-uuid": "*"    
   },  
   "engines": {
     "node": "0.8.x"
