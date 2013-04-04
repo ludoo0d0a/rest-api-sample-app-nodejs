@@ -1,9 +1,8 @@
-
 # Rest API Sample app in Node.js
 
 ## Overview
 
-    This is a simple pizza store app that allows you to explore the features provided by PayPal's REST APIs. Specfically, you can learn how to
+This is a simple pizza store app that allows you to explore the features provided by PayPal's REST APIs. Specfically, you can learn how to
 	
    * Save a credit card with paypal for future payments.
    * Make a payment using a saved credit card id.
