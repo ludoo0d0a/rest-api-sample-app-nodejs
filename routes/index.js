@@ -43,7 +43,6 @@ exports.completesignup = function(req, res) {
 		card = {type: userCard.type, number: userCard.number, cvv2: userCard.cvv2, expire_month: userCard.expire_month, expire_year: userCard.expire_year };			
 		//TODO: Create user even when card details are not given
 		paypal.credit_card.create(card, http_default_opts, function(err, card) {
-			console.log(err);
 			cardId = (err) ? "" : card.id; 
 			db.createUser(user.email, user.password, cardId, function(dbErr, response) {
 				if(dbErr) {
@@ -162,14 +161,14 @@ exports.order = function(req, res) {
 		db.getUser(req.session.email, function(err, user) {
 			if(err || !user) {			
 				console.log(err);
-				//TODO: Display error message to user
-				res.render('order_detail', { message: [{desc: "Could not retrieve credit card information", type: "error"}]});
+				res.render('order_detail', { message: [{desc: "Could not retrieve user information", type: "error"}]});
 			} else {
 				savedCard.payer.funding_instruments[0].credit_card_token.credit_card_id = user.card;	
 				savedCard.transactions[0].amount.total = req.query['order_amount'];
 				console.log(savedCard.transactions[0].amount.total);
-				paypal.payment.create(savedCard, http_default_opts, function(resp, err) {
+				paypal.payment.create(savedCard, http_default_opts, function(err, resp) {
 					if (err) {
+                        console.log(err);
 						throw err;
 					} 
 					if (resp) {
@@ -178,13 +177,12 @@ exports.order = function(req, res) {
 					    db.insertOrder(order_id, req.session.email, resp.id, resp.state, req.session.amount, req.session.desc, resp.create_time, function(err, order) {
 							if(err || !order) {			
 								console.log(err);
-								//TODO: Display error message to user
 								res.render('order_detail', { message: [{desc: "Could not save order details", type: "error"}]});
 							} else {
 								db.getOrders(req.session.email, function(err, orderList) {
 									console.log(orderList);
 									res.render('order_detail', {
-										title: 'Recent Order Details', 'ordrs' : orderList
+										 title: 'Recent Order Details', 'ordrs' : orderList, message: [{desc: "Order placed successfully..", type: "ifno"}]
 									});	
 								});		
 							}
@@ -201,7 +199,7 @@ exports.order = function(req, res) {
 	        },
 	        "redirect_urls": {
 	        "return_url": "",
-	        "cancel_url": "http:\/\/localhost\/test\/rest\/rest-api-sdk-php\/sample\/payments\/ExecutePayment.php?success=false"
+	        "cancel_url": "http://localhost:8080"
 	        },
 	        "transactions": [{
 	        "amount": {
@@ -214,7 +212,7 @@ exports.order = function(req, res) {
     
 	    paypalPayment.transactions[0].amount.total = req.query['order_amount'];
 	    paypalPayment.redirect_urls.return_url = "http://localhost:8080/orderExecute?order_id=" + order_id;
-	    paypal.payment.create(paypalPayment, http_default_opts, function(resp, err) {
+	    paypal.payment.create(paypalPayment, http_default_opts, function(err, resp) {
 		    if (err) {
 		        throw err;
 		    }
@@ -233,7 +231,6 @@ exports.order = function(req, res) {
 				db.insertOrder(order_id, req.session.email, resp.id, resp.state, req.session.amount, req.session.desc, '2012', function(err, order) {
 					if(err || !order) {			
 						console.log(err);
-						//TODO: Display error message to user
 						res.render('order_detail', { message: [{desc: "Could not save order details", type: "error"}]});
 					} else {
 						res.redirect(link[i].href);
@@ -249,7 +246,7 @@ exports.orderExecute = function(req, res) {
     res.locals.session = req.session;
     db.getOrder(req.query.order_id, function(err, order) {
         var PayerID = '{ "payer_id" : "'+ req.query.PayerID +'" }'
-        paypal.payment.execute(order.payment_id, PayerID, http_default_opts, function(resp, err) {
+        paypal.payment.execute(order.payment_id, PayerID, http_default_opts, function(err, resp) {
             if (err) {
                 console.log(err);
             } 
@@ -258,14 +255,12 @@ exports.orderExecute = function(req, res) {
                 db.updateOrder(req.query.order_id, resp.state, resp.create_time, function(err, updated) {
                     if(err) {			
 	                    console.log(err);
-	                    //TODO: Display error message to user
 	                    res.render('order_detail', { message: [{desc: "Could not retrieve order information", type: "error"}]});
                     } else {	
                         console.log(updated);
                         db.getOrders(req.session.email, function(err, orderList) {
-                            //console.log(orderList);
                             res.render('order_detail', {
-                            title: 'Recent Order Details', 'ordrs' : orderList
+                            title: 'Recent Order Details', 'ordrs' : orderList, message: [{desc: "Order placed successfully..", type: "ifno"}]
                             });	
                         });
                     }
@@ -274,4 +269,16 @@ exports.orderExecute = function(req, res) {
         });
     });  
  }; 
- 
+exports.orderList = function(req, res) {
+    res.locals.session = req.session;
+    if(req.session.authenticated) {
+       db.getOrders(req.session.email, function(err, orderList) {
+        res.render('order_detail', {
+            title: 'Recent Order Details', 'ordrs' : orderList
+        });	
+    });
+    } else {
+        res.redirect('signin');
+    }  
+    
+};
