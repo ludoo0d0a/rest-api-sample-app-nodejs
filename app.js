@@ -2,13 +2,24 @@ var template_engine = 'dust',
 	domain = 'localhost';
 
 var express = require('express'), 
-	routes = require('./routes'),	
+	routes = require('./routes'),
 	http = require('http'),
 	store = new express.session.MemoryStore,
 	path = require('path'),
-	flash = require('connect-flash');
+	flash = require('connect-flash'),
+    fs = require('fs');
 
 var app = express();
+
+// Configuration
+try {
+    var configJSON = fs.readFileSync(__dirname + "/config.json");
+    var config = JSON.parse(configJSON.toString());
+} catch(e) {
+    console.error("File config.json not found or is invalid: " + e.message);
+    process.exit(1);
+}
+routes.init(config);
 
 if ( template_engine == 'dust' ) {
 	var dust = require('dustjs-linkedin'),
@@ -18,7 +29,7 @@ if ( template_engine == 'dust' ) {
 app.configure(function() {
 	app.set('template_engine', template_engine);
 	app.set('domain', domain);
-	app.set('port', process.env.PORT || 3000);
+	app.set('port', config.port || 3000);
 	app.set('views', __dirname + '/views');
 	app.set('view engine', template_engine);
 	app.use(express.favicon());

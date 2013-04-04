@@ -3,7 +3,7 @@
 
 ## Overview
 
-	This is a simple pizza store app that allows you to explore the features provided by PayPal's REST APIs. Specfically, you can learn how to
+    This is a simple pizza store app that allows you to explore the features provided by PayPal's REST APIs. Specfically, you can learn how to
 	
    * Save a credit card with paypal for future payments.
    * Make a payment using a saved credit card id.
@@ -16,10 +16,15 @@
    
 ## Setting up the app
 
-   * Run `npm install` at the root folder to download dependencies
+   * Run `npm install` at the root folder to download dependencies.
+   * Make sure Mongo server is running
    * Run `node app.js` to start the application
    * Navigate to http://localhost:3000/ in your favourite browser.
 
+## Configuration
+
+   Please see `config.json` in the root folder if you want to change the default application / mongo settings.
+   
 ## References 
 
    * Github repository for Node.js REST API SDK - https://github.com/paypal/rest-api-sdk-nodejs

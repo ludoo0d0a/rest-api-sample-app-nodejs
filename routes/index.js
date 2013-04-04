@@ -2,13 +2,6 @@ var db = require('../lib/db')();
 var paypal = require('paypal-rest-sdk');
 var uuid = require('node-uuid');
 
-var http_default_opts = {
-	'host': 'api.sandbox.paypal.com',
-	'port': '',
-	'client_id': 'EBWKjlELKMYqRNQ6sYvFo64FtaRLRR5BdHEESmha49TM',
-	'client_secret': 'EO422dn3gQLgDbuwqTjzrFgFtaRLRR5BdHEESmha49TM'
-};
-
 // Index page
 exports.index = function(req, res) {
 	res.locals.session = req.session;
@@ -43,7 +36,7 @@ exports.completesignup = function(req, res) {
 		//TODO: Add card validation		
 		card = {type: userCard.type, number: userCard.number, cvv2: userCard.cvv2, expire_month: userCard.expire_month, expire_year: userCard.expire_year };			
 		//TODO: Create user even when card details are not given
-		paypal.credit_card.create(card, http_default_opts, function(err, card) {
+		paypal.credit_card.create(card, {}, function(err, card) {
 			cardId = (err) ? "" : card.id; 
 			db.createUser(user.email, user.password, cardId, function(dbErr, response) {
 				if(dbErr) {
@@ -105,7 +98,7 @@ exports.profile = function(req, res) {
 			//TODO: Display error message to user
 			res.render('profile', { message: [{desc: "Could not retrieve profile information", type: "error"}]});
 		} else {		
-			paypal.credit_card.get(user.card, http_default_opts, function(err, card) {
+			paypal.credit_card.get(user.card, {}, function(err, card) {
 				if(err) {						
 					res.render('profile', {user: user, message: [{desc: "Could not retrieve card information", type: "error"}]});
 				} else {
@@ -135,7 +128,7 @@ exports.updateprofile = function(req, res){
 			// Update credit card info
 			if(cardData.type !== "" && cardData.number !== "") {
 				card = {type: cardData.type, number: cardData.number, cvv2: cardData.cvv2, expire_month: cardData.expire_month, expire_year: cardData.expire_year };		
-				paypal.credit_card.create(card, http_default_opts, function(err, card) {
+				paypal.credit_card.create(card, {}, function(err, card) {
 					if(err) {
 						res.render('profile', {user: savedUser, message: [{ desc: "Error updating profile: " + err, type: "error"}]});
 					} else {
@@ -151,7 +144,7 @@ exports.updateprofile = function(req, res){
 				});
 			} else if (savedUser.card) {
 				console.log("retrieving saved card " + savedUser.card);
-				paypal.credit_card.get(savedUser.card, http_default_opts, function(err, card) {
+				paypal.credit_card.get(savedUser.card, {}, function(err, card) {
 					// Display profile page even if we cannot display card info
 					if(err) {
 						card = {};
@@ -217,7 +210,7 @@ exports.order = function(req, res) {
 				savedCard.payer.funding_instruments[0].credit_card_token.credit_card_id = user.card;	
 				savedCard.transactions[0].amount.total = req.query['order_amount'];
 				savedCard.transactions[0].description = req.session.desc;
-				paypal.payment.create(savedCard, http_default_opts, function(err, resp) {
+				paypal.payment.create(savedCard, {}, function(err, resp) {
 					if (err) {
 						//TODO: Redirect
                         console.log(err);
@@ -257,10 +250,11 @@ exports.order = function(req, res) {
     
 	    paypalPayment.transactions[0].amount.total = req.query['order_amount'];
 	    paypalPayment.redirect_urls.return_url = "http://localhost:3000/orderExecute?order_id=" + order_id;
-	    paypalPayment.redirect_urls.return_url = "http://localhost:3000/?status=cancel&order_id" + order_id;
+	    paypalPayment.redirect_urls.cancel_url = "http://localhost:3000/?status=cancel&order_id" + order_id;
 	    paypalPayment.transactions[0].description = req.session.desc;
-	    paypal.payment.create(paypalPayment, http_default_opts, function(err, resp) {
+	    paypal.payment.create(paypalPayment, {}, function(err, resp) {
 		    if (err) {
+		    	console.log(err);
 		        throw err;
 		    }
 
@@ -287,7 +281,7 @@ exports.orderExecute = function(req, res) {
     res.locals.session = req.session;
     db.getOrder(req.query.order_id, function(err, order) {
         var payer = { payer_id : req.query.PayerID };
-        paypal.payment.execute(order.payment_id, payer, http_default_opts, function(err, resp) {
+        paypal.payment.execute(order.payment_id, payer, {}, function(err, resp) {
             if (err) {
             	//TODO: error handling - redirect
                 console.log(err);
@@ -324,3 +318,8 @@ exports.orderList = function(req, res) {
 		}
 	});      
 };
+
+exports.init = function(config) {
+	paypal.configure(config.api);
+	db.configure(config.mongo);
+}
