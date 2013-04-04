@@ -158,8 +158,7 @@ exports.order = function(req, res) {
 		db.getUser(req.session.email, function(err, user) {
 			if(err || !user) {			
 				console.log(err);
-				//TODO: Display error message to user
-				res.render('order_detail', { message: [{desc: "Could not retrieve credit card information", type: "error"}]});
+				res.render('order_detail', { message: [{desc: "Could not retrieve user information", type: "error"}]});
 			} else {
 				savedCard.payer.funding_instruments[0].credit_card_token.credit_card_id = user.card;	
 				savedCard.transactions[0].amount.total = req.query['order_amount'];
