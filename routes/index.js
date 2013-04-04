@@ -273,9 +273,14 @@ exports.orderList = function(req, res) {
     res.locals.session = req.session;
     if(req.session.authenticated) {
        db.getOrders(req.session.email, function(err, orderList) {
-        res.render('order_detail', {
-            title: 'Recent Order Details', 'ordrs' : orderList
-        });	
+           if(err){
+                console.log(err);
+	            res.render('order_detail', { message: [{desc: "Could not retrieve order details", type: "error"}]});
+           } else {
+            res.render('order_detail', {
+                title: 'Recent Order Details', 'ordrs' : orderList
+            });	
+        }
     });
     } else {
         res.redirect('signin');
