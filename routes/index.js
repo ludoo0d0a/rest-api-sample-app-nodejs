@@ -40,7 +40,7 @@ exports.completesignup = function(req, res) {
 			cardId = (err) ? "" : card.id; 
 			db.createUser(user.email, user.password, cardId, function(dbErr, response) {
 				if(dbErr) {
-					res.render('sign_up', {message: [{desc: err, type: "error"}]});
+					res.render('sign_up', {message: [{desc: dbErr.message, type: "error"}]});
 				} else {
 					req.session.authenticated = true;
 					req.session.email = user.email;
