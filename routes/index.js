@@ -11,7 +11,8 @@ var http_default_opts = {
 
 exports.index = function(req, res) {
 	res.locals.session = req.session;
-	var message = (req.flash && req.flash('message')) ? req.flash('message') : [];	
+	var error = req.flash('error');
+	var message = error.length > 0 ? error[0].message : error;
 	res.render('index', {message: message});
 };
 
@@ -41,21 +42,22 @@ exports.completesignup = function(req, res) {
 		//TODO: Add card validation		
 		card = {type: userCard.type, number: userCard.number, cvv2: userCard.cvv2, expire_month: userCard.expire_month, expire_year: userCard.expire_year };			
 		//TODO: Create user even when card details are not given
-		paypal.credit_card.create(card, http_default_opts, function(card, err) {
-			console.log(card);
+		paypal.credit_card.create(card, http_default_opts, function(err, card) {
+			console.log(err);
 			cardId = (err) ? "" : card.id; 
-			db.createUser(user.email, user.password, card.id, function(dbErr, response) {
+			db.createUser(user.email, user.password, cardId, function(dbErr, response) {
 				if(dbErr) {
 					res.render('sign_up', {message: [{desc: err, type: "error"}]});
 				} else {
+					req.session.authenticated = true;
+					req.session.email = user.email;
 					if(err) {						
-						res.render('', {message: [{desc: "You have been signed up but we had trouble saving your card information.", type: "error"}]});
-					} else {
-						req.session.authenticated = true;
-						req.session.email = user.email;
-						req.flash('message', [{desc: "You have been signed up successfully", type: "info"}]);			
-						res.redirect('');						
+						console.log(err);					
+						req.flash('error', {message: [{desc: "You have been signed up but we had trouble saving your card information.", type: "error"}]});
+					} else {						
+						req.flash('error', {message: [{desc: "You have been signed up successfully", type: "info"}]});
 					}
+					res.redirect('');
 				}
 			});			
 		});
@@ -65,18 +67,20 @@ exports.completesignup = function(req, res) {
 
 exports.signin = function(req, res) {
 	res.locals.session = req.session;
-	var message = (req.flash && req.flash('message')) ? req.flash('message') : [];	
+	var error = req.flash('error');
+	var message = error.length > 0 ? error[0].message : error;	
 	res.render('sign_in', {message: message});
 };
+
 
 exports.dologin = function(req, res) {
 	res.locals.session = req.session;
 	
 	var user = req.body.user;
 	db.authenticateUser(user.email, user.password, function(err, response) {
-		if(err) {
-			req.flash('message', [{desc: err, type: "error"}]);			
-			res.redirect('signin');
+		if(err) {			
+			req.flash('error', { message : [{desc: err.message, type: "error"}]})
+ 			res.redirect('/signin');
 		} else {
 			req.session.authenticated = true;
 			req.session.email = user.email;			
@@ -101,7 +105,7 @@ exports.profile = function(req, res) {
 			//TODO: Display error message to user
 			res.render('profile', { message: [{desc: "Could not retrieve profile information", type: "error"}]});
 		} else {		
-			paypal.credit_card.get(user.card, http_default_opts, function(card, err) {
+			paypal.credit_card.get(user.card, http_default_opts, function(err, card) {
 				if(err) {						
 					res.render('profile', {user: user, message: [{desc: "Could not retrieve card information", type: "error"}]});
 				} else {

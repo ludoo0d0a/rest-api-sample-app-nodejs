@@ -27,9 +27,9 @@ app.configure(function() {
 	app.use(express.cookieParser());
 	app.use(express.session({ secret: 'whatever', store: store }));
 	app.use(express.session());
+	app.use(express.static(path.join(__dirname, 'public')));
 	app.use(flash());	
-	app.use(app.router);	
-	app.use(express.static(path.join(__dirname, 'public')));	
+	app.use(app.router);		
 });
 
 app.configure('development', function(){
