@@ -198,7 +198,7 @@ exports.order = function(req, res) {
 	        },
 	        "redirect_urls": {
 	        "return_url": "",
-	        "cancel_url": "http:\/\/localhost\/test\/rest\/rest-api-sdk-php\/sample\/payments\/ExecutePayment.php?success=false"
+	        "cancel_url": "http://localhost:8080"
 	        },
 	        "transactions": [{
 	        "amount": {
