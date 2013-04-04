@@ -174,7 +174,6 @@ exports.order = function(req, res) {
 					    db.insertOrder(order_id, req.session.email, resp.id, resp.state, req.session.amount, req.session.desc, resp.create_time, function(err, order) {
 							if(err || !order) {			
 								console.log(err);
-								//TODO: Display error message to user
 								res.render('order_detail', { message: [{desc: "Could not save order details", type: "error"}]});
 							} else {
 								db.getOrders(req.session.email, function(err, orderList) {
@@ -229,7 +228,6 @@ exports.order = function(req, res) {
 				db.insertOrder(order_id, req.session.email, resp.id, resp.state, req.session.amount, req.session.desc, '2012', function(err, order) {
 					if(err || !order) {			
 						console.log(err);
-						//TODO: Display error message to user
 						res.render('order_detail', { message: [{desc: "Could not save order details", type: "error"}]});
 					} else {
 						res.redirect(link[i].href);
@@ -254,12 +252,10 @@ exports.orderExecute = function(req, res) {
                 db.updateOrder(req.query.order_id, resp.state, resp.create_time, function(err, updated) {
                     if(err) {			
 	                    console.log(err);
-	                    //TODO: Display error message to user
 	                    res.render('order_detail', { message: [{desc: "Could not retrieve order information", type: "error"}]});
                     } else {	
                         console.log(updated);
                         db.getOrders(req.session.email, function(err, orderList) {
-                            //console.log(orderList);
                             res.render('order_detail', {
                             title: 'Recent Order Details', 'ordrs' : orderList, message: [{desc: "Order placed successfully..", type: "ifno"}]
                             });	
@@ -274,7 +270,6 @@ exports.orderList = function(req, res) {
     res.locals.session = req.session;
     if(req.session.authenticated) {
        db.getOrders(req.session.email, function(err, orderList) {
-        //console.log(orderList);
         res.render('order_detail', {
             title: 'Recent Order Details', 'ordrs' : orderList
         });	
