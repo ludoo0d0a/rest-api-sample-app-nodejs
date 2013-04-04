@@ -13,7 +13,8 @@
     "mongoskin": "*",
     "consolidate": "*",
     "connect-flash": "*",
-    "node-uuid": "*"    
+    "node-uuid": "*",
+    "crypto" : "*" 
   },  
   "engines": {
     "node": "0.8.x"
