@@ -168,8 +168,8 @@ exports.updateprofile = function(req, res){
 
 exports.orderconfirm = function(req, res) {
     res.locals.session = req.session;
-    var amount = req.query["orderAmount"],
-        desc   = req.query["orderDescription"];
+    var amount = req.query.orderAmount,
+        desc   = req.query.orderDescription;
         req.session.amount = amount;
         req.session.desc = desc;
     if(req.session.authenticated) {
@@ -190,7 +190,7 @@ exports.order = function(req, res) {
     
     if(req.query['order_payment_method'] === 'credit_card')
     {
-        var savedCard = {
+        var payment = {
 	        "intent": "sale",
 	        "payer": {
 	            "payment_method": "credit_card",
@@ -211,14 +211,13 @@ exports.order = function(req, res) {
 				console.log(err);
 				res.render('order_detail', { message: [{desc: "Could not retrieve user information", type: "error"}]});
 			} else {
-				savedCard.payer.funding_instruments[0].credit_card_token.credit_card_id = user.card;	
-				savedCard.transactions[0].amount.total = req.query['order_amount'];
-				savedCard.transactions[0].description = req.session.desc;
-				paypal.payment.create(savedCard, {}, function(err, resp) {
-					if (err) {
-						//TODO: Redirect
+				payment.payer.funding_instruments[0].credit_card_token.credit_card_id = user.card;	
+				payment.transactions[0].amount.total = req.query['order_amount'];
+				payment.transactions[0].description = req.session.desc;
+				paypal.payment.create(payment, http_default_opts, function(err, resp) {
+					if (err) {					
                         console.log(err);
-						throw err;
+                        res.render('order_detail', { message: [{desc: "Payment API call failed", type: "error"}]});
 					} 
 					if (resp) {					    
 					    db.insertOrder(order_id, req.session.email, resp.id, resp.state, req.session.amount, req.session.desc, resp.create_time, function(err, order) {
@@ -258,8 +257,7 @@ exports.order = function(req, res) {
 	    paypalPayment.transactions[0].description = req.session.desc;
 	    paypal.payment.create(paypalPayment, {}, function(err, resp) {
 		    if (err) {
-		    	console.log(err);
-		        throw err;
+		        res.render('order_detail', { message: [{desc: "Payment API call failed", type: "error"}]});
 		    }
 
 			if(resp) {				
@@ -287,8 +285,8 @@ exports.orderExecute = function(req, res) {
         var payer = { payer_id : req.query.PayerID };
         paypal.payment.execute(order.payment_id, payer, {}, function(err, resp) {
             if (err) {
-            	//TODO: error handling - redirect
                 console.log(err);
+                 res.render('order_detail', { message: [{desc: "execute payment API failed", type: "error"}]});
             } 
             if (resp) {                
                 db.updateOrder(req.query.order_id, resp.state, resp.create_time, function(err, updated) {
