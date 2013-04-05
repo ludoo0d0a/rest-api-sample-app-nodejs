@@ -4,7 +4,7 @@
 var db = require('../lib/db')();
 var paypal = require('paypal-rest-sdk');
 var uuid = require('node-uuid');
-
+var config = {};
 // Index page
 exports.index = function (req, res) {
 	res.locals.session = req.session;
@@ -268,9 +268,10 @@ exports.order = function (req, res) {
 	        }]
 	    };
 
+		console.log(config);
 	    paypalPayment.transactions[0].amount.total = req.query.order_amount;
-	    paypalPayment.redirect_urls.return_url = "http://localhost:3000/orderExecute?order_id=" + order_id;
-	    paypalPayment.redirect_urls.cancel_url = "http://localhost:3000/?status=cancel&order_id" + order_id;
+	    paypalPayment.redirect_urls.return_url = "http://localhost:" + (config.port ? config.port : 3000) + "/orderExecute?order_id=" + order_id;
+	    paypalPayment.redirect_urls.cancel_url = "http://localhost:" + (config.port ? config.port : 3000) + "/?status=cancel&order_id" + order_id;
 	    paypalPayment.transactions[0].description = req.session.desc;
 	    paypal.payment.create(paypalPayment, {}, function (err, resp) {
 		    if (err) {
@@ -278,7 +279,8 @@ exports.order = function (req, res) {
 		    }
 
 			if (resp) {
-				db.insertOrder(order_id, req.session.email, resp.id, resp.state, req.session.amount, req.session.desc, '2012', function (err, order) {
+				var now = (new Date()).toISOString().replace(/\.[\d]{3}Z$/, 'Z ');
+				db.insertOrder(order_id, req.session.email, resp.id, resp.state, req.session.amount, req.session.desc, now, function (err, order) {
 					if (err || !order) {
 						console.log(err);
 						res.render('order_detail', { message: [{desc: "Could not save order details", type: "error"}]});
@@ -336,7 +338,8 @@ exports.orderList = function (req, res) {
 	});
 };
 
-exports.init = function (config) {
-	paypal.configure(config.api);
-	db.configure(config.mongo);
+exports.init = function (c) {
+	config = c;
+	paypal.configure(c.api);
+	db.configure(c.mongo);
 };
