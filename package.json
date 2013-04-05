@@ -1,7 +1,16 @@
 {
+  "author": "PayPal <DL-PP-Platform-NodeJs-SDK@ebay.com> (https://developer.paypal.com/)",
   "name": "paypal-rest-sample",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/paypal/rest-api-sample-nodejs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/paypal/rest-api-sample-nodejs/issues",
+    "email": "DL-PP-Platform-NodeJs-SDK@ebay.com"
+  },
   "scripts": {
     "start": "node app.js"
   },
@@ -15,6 +24,10 @@
     "connect-flash": "*",
     "node-uuid": "*",
     "crypto" : "*" 
+  },
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-jshint": "~0.3.0"
   },  
   "engines": {
     "node": "0.8.x"

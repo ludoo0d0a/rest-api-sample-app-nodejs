@@ -64,7 +64,7 @@ app.post('/profile', routes.auth, routes.updateprofile);
 
 app.get('/order', routes.auth, routes.order);
 app.get('/orderList', routes.auth, routes.orderList);
-app.get('/orderConfirm', routes.auth, routes.orderconfirm);
+app.post('/orderConfirm', routes.auth, routes.orderconfirm);
 app.get('/orderExecute', routes.auth, routes.orderExecute);
 
 http.createServer(app).listen(app.get('port'), function(){
