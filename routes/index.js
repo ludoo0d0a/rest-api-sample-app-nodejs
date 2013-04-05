@@ -44,9 +44,9 @@ exports.completesignup = function(req, res) {
 				} else {
 					req.session.authenticated = true;
 					req.session.email = user.email;
-					if(err) {						
-						console.log(err);					
-						req.flash('error', {message: [{desc: "You have been signed up but we had trouble saving your card information.", type: "error"}]});
+					if(err && (userCard.type !== '' || userCard.number !== '')) {						
+						console.log("card creation error: " + JSON.stringify(err.error.details));					
+						req.flash('error', {message: [{desc: "You have been signed up but we had trouble saving your credit card.", type: "error"}]});
 					} else {						
 						req.flash('error', {message: [{desc: "You have been signed up successfully", type: "info"}]});
 					}
@@ -86,6 +86,7 @@ exports.signout = function(req, res) {
 	res.locals.session = req.session;
 	req.session.authenticated = false;
 	req.session.email = '';
+	req.flash('error', { message : [{desc: "You have been signed out.", type: "info"}]})
 	res.redirect('/');
 };
 
@@ -95,14 +96,13 @@ exports.profile = function(req, res) {
 	db.getUser(req.session.email, function(err, user) {
 		if(err || !user) {			
 			console.log(err);
-			//TODO: Display error message to user
 			res.render('profile', { message: [{desc: "Could not retrieve profile information", type: "error"}]});
 		} else {		
 			paypal.credit_card.get(user.card, {}, function(err, card) {
-				if(err) {						
+				if(err) {
+					console.log(err);						
 					res.render('profile', {user: user, message: [{desc: "Could not retrieve card information", type: "error"}]});
 				} else {
-					console.log("No err");
 					res.render('profile', {user: user, card: card});						
 				}
 			});	
@@ -112,56 +112,69 @@ exports.profile = function(req, res) {
 
 exports.updateprofile = function(req, res){
 	res.locals.session = req.session;
-	var userData = req.body.user;
-	var cardData = userData.credit_card;
-	
-	db.authenticateUser(req.session.email, userData.current_password, function(authErr, authRes) {
-		if(authErr) {
-			res.render('profile', {user: savedUser, message: [ { desc: "Your current password is incorrect", type: "error"}]});
-		} else {
-			db.getUser(req.session.email, function(err, savedUser) {
-				if(err) {
-					res.render('profile', {message: [{ desc: "Could not retrieve user record", type: "error"}]});
-				} else if(userData.password != '' && userData.password != userData.password_confirmation) {
-					res.render('profile', {user: savedUser, message: [{ desc: "Your passwords do not match", type: "error"}]});
+	var userData = req.body.user,
+		cardData = userData.credit_card,
+		data = {},
+		newPassword,
+		newCard;
+		
+	db.authenticateUser(req.session.email, userData.current_password, function(authErr, authRes) {				
+		db.getUser(req.session.email, function(userErr, savedUser) {
+			paypal.credit_card.get(savedUser.card, {}, function(cardErr, card) {
+			
+				data.user = (userErr) ? {} : savedUser;
+				data.card = (cardErr) ? {} : card;
+				if(authErr) {
+					data.message = [{ desc: "Your current password is incorrect", type: "error"}];
+					res.render('profile', data);
 				} else {
-					cardId = savedUser.card;
-					// Update credit card info
-					if(cardData.type !== "" && cardData.number !== "") {
+					if(userData.password !== '' ) {
+						if(userData.password !== userData.password_confirmation) {
+							data.message = [{ desc: "Your passwords do not match", type: "error"}];
+							res.render('profile', data);
+						} else {
+							newPassword = userData.password;
+						}						
+					}
+					if(cardData.type !== '' || cardData.number !== '') {
 						card = {type: cardData.type, number: cardData.number, cvv2: cardData.cvv2, expire_month: cardData.expire_month, expire_year: cardData.expire_year };		
 						paypal.credit_card.create(card, {}, function(err, card) {
 							if(err) {
-								res.render('profile', {user: savedUser, message: [{ desc: "Error updating profile: " + err, type: "error"}]});
-							} else {
-								// Update database
-								db.updateUser(userData.email, userData.password, card.id, function(err, user) {
-									if(err) {
-										res.render('profile', {user: savedUser, card: card, message: [{ desc: "Error updating profile: " + err, type: "error"}]});
-									} else {
-										res.render('profile', {user: user,  card: card, message: [{ desc: "Your profile has been updated", type: "info"}]});
-									}
-								});						
-							}
-						});
-					} else if (savedUser.card) {
-						console.log("retrieving saved card " + savedUser.card);
-						paypal.credit_card.get(savedUser.card, {}, function(err, card) {
-							// Display profile page even if we cannot display card info
-							if(err) {
-								card = {};
-							}
-							db.updateUser(userData.email, userData.password, savedUser.card, function(err, user) {
-								if(err) {
-									res.render('profile', {user: savedUser, card: card, message: [{ desc: "Error updating profile: " + err, type: "error"}]});
-								} else {
-									res.render('profile', {user: user,  card: card, message: [{ desc: "Your profile has been updated", type: "info"}]});
+								console.log("card creation error: " + JSON.stringify(err.error.details));
+								data.message = [{ desc: "Error saving card information: " + err.message, type: "error"}];
+								if(newPassword !== null) {
+									data.message.push({ desc: "Your password has not been updated.", type: "block"});
 								}
-							});						
+								res.render('profile', data);
+							} else {
+								newCard = card.id;							
+								db.updateUser(userData.email, newPassword, newCard, function(err, user) {
+									if(err) {
+										messages = [{ desc: "Error updating profile: " + err, type: "error"}];
+									} else {
+										data.card = card;
+										data.user = user;
+										messages = [{ desc: "Your profile has been updated", type: "info"}];										
+									}
+									data.message = messages;
+									res.render('profile', data);							
+								});	
+							} 
 						});
-					}			
+					} else {
+						db.updateUser(userData.email, newPassword, newCard, function(err, user) {
+							if(err) {
+								data.message = [{ desc: "Error updating profile: " + err, type: "error"}];
+							} else {
+								data.user = user;
+								data.message = [{ desc: "Your profile has been updated", type: "info"}];
+							}
+							res.render('profile', data);
+						});	
+					}
 				}
-			});
-		}	
+			});		
+		});			
 	});	
 	
 };
@@ -172,16 +185,16 @@ exports.orderconfirm = function(req, res) {
         desc   = req.query.orderDescription;
         req.session.amount = amount;
         req.session.desc = desc;
-    if(req.session.authenticated) {
-        res.render('order_confirm', {'amount' : amount, 'desc' : desc, 'credit_card' : 'true'});
-    } else {
-        res.redirect('signin');
-    }  
-	
+       
+	db.getUser(req.session.email, function(err, user) {
+		var data = {'amount' : amount, 'desc' : desc};
+		console.log(user.card);
+		if(!err && ( user.card !== undefined && user.card !== '') ) {
+			data.credit_card = 'true';
+		}
+		res.render('order_confirm', data);
+	});
 };
-
-exports.orders = function(req, res) {
-}
 
 exports.order = function(req, res) {
 
@@ -214,7 +227,7 @@ exports.order = function(req, res) {
 				payment.payer.funding_instruments[0].credit_card_token.credit_card_id = user.card;	
 				payment.transactions[0].amount.total = req.query['order_amount'];
 				payment.transactions[0].description = req.session.desc;
-				paypal.payment.create(payment, http_default_opts, function(err, resp) {
+				paypal.payment.create(payment, {}, function(err, resp) {
 					if (err) {					
                         console.log(err);
                         res.render('order_detail', { message: [{desc: "Payment API call failed", type: "error"}]});
@@ -228,7 +241,7 @@ exports.order = function(req, res) {
 								db.getOrders(req.session.email, function(err, orderList) {
 									console.log(orderList);
 									res.render('order_detail', {
-										 title: 'Recent Order Details', 'ordrs' : orderList, message: [{desc: "Order placed successfully.", type: "info"}]
+										 title: 'Recent Orders', 'orders' : orderList, message: [{desc: "Order placed successfully.", type: "info"}]
 									});	
 								});		
 							}
@@ -297,7 +310,7 @@ exports.orderExecute = function(req, res) {
                         console.log(updated);
                         db.getOrders(req.session.email, function(err, orderList) {
                             res.render('order_detail', {
-                            	title: 'Recent Order Details', 'ordrs' : orderList, message: [{desc: "Order placed successfully.", type: "info"}]
+                            	title: 'Recent Orders', 'orders' : orderList, message: [{desc: "Order placed successfully.", type: "info"}]
                             });	
                         });
                     }
@@ -315,7 +328,7 @@ exports.orderList = function(req, res) {
 			res.render('order_detail', { message: [{desc: "Could not retrieve order details", type: "error"}]});
 		} else {
 			res.render('order_detail', {
-				title: 'Recent Order Details', 'ordrs' : orderList
+				title: 'Recent Orders', 'orders' : orderList
 			});	
 		}
 	});      

@@ -16,8 +16,8 @@ This is a simple pizza store app that allows you to explore the features provide
 ## Setting up the app
 
    * Run `npm install` at the root folder to download dependencies.
-   * Make sure Mongo server is running
-   * Run `node app.js` to start the application
+   * Make sure Mongo server is running. The app creates a database called `paypal_pizza` by default.
+   * Run `node app.js` to start the application.
    * Navigate to http://localhost:3000/ in your favourite browser.
 
 ## Configuration

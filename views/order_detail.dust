@@ -1,4 +1,4 @@
- {>layout/}
+{>layout/}
 {<content}
 	<div class='container' id='content'>
     {#message}
@@ -6,29 +6,28 @@
 			<button class="close" data-dismiss="alert">&times;</button>
 			{desc}
 		</div>
-    {/message} 
-				<h2>Orders</h2>
-		<table class='table'>
-			<thead>
-				<tr>
-					<th>Order Id</th>
-					<th>Amount($)</th>
-					<th>Payment Status</th>
-					<th>Time</th>
-					<th>Description</th>
-				</tr>
-			</thead>			
-			<tbody>
-				  {#ordrs}
-				<tr>
-					<td>{_id}</td>
-					<td>{amount}</td>
-					<td>{state}</td>
-					<td>{created_time}</td>
-					<td>{description}</td>					
-				</tr>
-            		   {/ordrs}
-			</tbody>
-		</table>
-	</div>
-   {/content}
+    {/message}
+	<table class='table'>
+		<thead>
+			<tr>
+				<th>Order Id</th>
+				<th>Amount($)</th>
+				<th>Payment Status</th>
+				<th>Time</th>
+				<th>Description</th>
+			</tr>
+		</thead>			
+		<tbody>
+			{#orders}
+			<tr>
+				<td>{_id}</td>
+				<td>{amount}</td>
+				<td>{state}</td>
+				<td>{created_time}</td>
+				<td>{description}</td>					
+			</tr>
+		   {/orders}
+		</tbody>
+	</table>
+</div>
+{/content}

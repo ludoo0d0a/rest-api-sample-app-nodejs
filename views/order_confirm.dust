@@ -26,12 +26,10 @@
 				<div class="controls">
 					<select class="select optional" id="order_payment_method"
 						name="order_payment_method">
-                        {#credit_card}
-                            <option value="paypal">PayPal</option>
+                        {#credit_card}                            
                             <option value="credit_card">Credit Card</option>
-                        {:else}
-                            <option value="paypal">PayPal</option>
                         {/credit_card}
+						<option value="paypal">PayPal</option>
 					</select>
 				</div>
 			</div>
