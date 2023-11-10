@@ -1,0 +1,204 @@
+repo_name: ludoo0d0a/rest-api-sample-app-nodejs
+report_id: 002a4130fd79fb445f8754857b468a85
+repo_type: Public
+timestamp: '2023-11-09T21:31:20+00:00'
+requested_by: avidas
+provider: github
+branch: master
+detected_tools_count: 13
+tools:
+- name: CSS 3
+  description: The latest evolution of the Cascading Style Sheets language
+  website_url: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS3
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Languages
+  image_url: https://img.stackshare.io/service/6727/css.png
+  detection_source: Repo Metadata
+- name: JavaScript
+  description: Lightweight, interpreted, object-oriented language with first-class
+    functions
+  website_url: https://developer.mozilla.org/en-US/docs/Web/JavaScript
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Languages
+  image_url: https://img.stackshare.io/service/1209/javascript.jpeg
+  detection_source: Repo Metadata
+- name: ExpressJS
+  description: Sinatra inspired web development framework for node.js -- insanely
+    fast, flexible, and simple
+  website_url: http://expressjs.com/
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Languages & Frameworks
+  sub_category: Microframeworks (Backend)
+  image_url: https://img.stackshare.io/service/1163/hashtag.png
+  detection_source: package.json
+  last_updated_by: Ganesh Hegde
+  last_updated_on: 2013-03-27 06:41:38.000000000 Z
+- name: Git
+  description: Fast, scalable, distributed revision control system
+  website_url: http://git-scm.com/
+  open_source: true
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Version Control System
+  image_url: https://img.stackshare.io/service/1046/git.png
+  detection_source: Repo Metadata
+- name: npm
+  description: The package manager for JavaScript.
+  website_url: https://www.npmjs.com/
+  open_source: false
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Front End Package Manager
+  image_url: https://img.stackshare.io/service/1120/lejvzrnlpb308aftn31u.png
+  detection_source: package.json
+  last_updated_by: Ganesh Hegde
+  last_updated_on: 2013-03-27 06:41:38.000000000 Z
+- name: connect-flash
+  description: Flash message middleware for Connect
+  package_url: https://www.npmjs.com/connect-flash
+  version: 0.1.1
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: npm Packages
+  image_url: https://img.stackshare.io/package/17693/default_148ef251371a47f69a7acad9f3b25e2ec2ee4aa4.png
+  detection_source_url: package.json
+  detection_source: package.json
+  last_updated_by: Avi Das
+  last_updated_on: 2014-06-04 14:54:42.000000000 Z
+- name: consolidate
+  description: Template engine consolidation library
+  package_url: https://www.npmjs.com/consolidate
+  version: 0.10.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: npm Packages
+  image_url: https://img.stackshare.io/package/16791/default_661bbd7f9556b6c5c0b8be11cd13e1813fc5c977.png
+  detection_source_url: package.json
+  detection_source: package.json
+  last_updated_by: Avi Das
+  last_updated_on: 2014-06-04 14:54:42.000000000 Z
+- name: crypto
+  description: This package is no longer supported and has been deprecated
+  package_url: https://www.npmjs.com/crypto
+  version: 0.0.3
+  license: ISC
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: npm Packages
+  image_url: https://img.stackshare.io/package/16387/default_000ae7ee50b56e0ecdb07d3662d4b3fa7f4cbdcc.png
+  detection_source_url: package.json
+  detection_source: package.json
+  last_updated_by: Avi Das
+  last_updated_on: 2014-06-04 14:54:42.000000000 Z
+- name: dustjs-linkedin
+  description: Asynchronous templates for the browser and server
+  package_url: https://www.npmjs.com/dustjs-linkedin
+  version: 2.3.5
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: npm Packages
+  image_url: https://img.stackshare.io/package/18217/default_b3a33eac81265f816fe4761f2b8308e8b7d927ec.png
+  detection_source_url: package.json
+  detection_source: package.json
+  last_updated_by: Avi Das
+  last_updated_on: 2014-06-04 14:54:42.000000000 Z
+  vulnerabilities:
+  - name: dustjs-linkedin vulnerable to Prototype Pollution
+    cve_id: CVE-2021-4264
+    cve_url: https://github.com/advisories/GHSA-c6rp-wrp9-qr4q
+    detected_date: Dec 22
+    severity: high
+    first_patched: 3.0.0
+- name: express
+  description: Fast, unopinionated, minimalist web framework
+  package_url: https://www.npmjs.com/express
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: npm Packages
+  image_url: https://img.stackshare.io/package/15818/default_db4a7791d2f1174547374b9b587bc10fec088a5a.png
+  detection_source: package.json
+  last_updated_by: Ganesh Hegde
+  last_updated_on: 2013-03-27 06:41:38.000000000 Z
+- name: grunt
+  description: The JavaScript Task Runner
+  package_url: https://www.npmjs.com/grunt
+  version: 0.4.1
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: npm Packages
+  image_url: https://img.stackshare.io/package/15835/default_0b10af8ca19c215f781dc07442e75bdc831089d0.png
+  detection_source_url: package.json
+  detection_source: package.json
+  last_updated_by: aydiv
+  last_updated_on: 2013-04-05 10:19:02.000000000 Z
+  vulnerabilities:
+  - name: Race Condition in Grunt
+    cve_id: CVE-2022-1537
+    cve_url: https://github.com/advisories/GHSA-rm36-94g8-835r
+    detected_date: May 26
+    severity: high
+    first_patched: 1.5.3
+  - name: Arbitrary Code Execution in grunt
+    cve_id: CVE-2020-7729
+    cve_url: https://github.com/advisories/GHSA-m5pj-vjjf-4m3h
+    detected_date: Aug 22
+    severity: high
+    first_patched: 1.3.0
+  - name: Path Traversal in Grunt
+    cve_id: CVE-2022-0436
+    cve_url: https://github.com/advisories/GHSA-j383-35pm-c5h4
+    detected_date: Apr 27
+    severity: moderate
+    first_patched: 1.5.2
+- name: grunt-contrib-jshint
+  description: Validate files with JSHint
+  package_url: https://www.npmjs.com/grunt-contrib-jshint
+  version: 0.3.0
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: npm Packages
+  image_url: https://img.stackshare.io/package/15898/default_59a1b5716eefa3750c20936c3d53ff13a6390ee1.png
+  detection_source_url: package.json
+  detection_source: package.json
+  last_updated_by: aydiv
+  last_updated_on: 2013-04-05 10:19:02.000000000 Z
+- name: node-uuid
+  description: Rigorous implementation of RFC4122
+  package_url: https://www.npmjs.com/node-uuid
+  version: 1.4.1
+  license: MIT
+  open_source: true
+  hosted_saas: false
+  category: Libraries
+  sub_category: npm Packages
+  image_url: https://img.stackshare.io/package/16142/default_ac04a744873b460c4ef30a7450ed0c83223640ab.png
+  detection_source_url: package.json
+  detection_source: package.json
+  last_updated_by: Avi Das
+  last_updated_on: 2014-06-04 14:54:42.000000000 Z
+  vulnerabilities:
+  - name: Insecure Entropy Source - Math.random() in node-uuid
+    cve_id: CVE-2015-8851
+    cve_url: https://github.com/advisories/GHSA-265q-28rp-chq5
+    detected_date: Aug 22
+    severity: high
+    first_patched: 1.4.4
